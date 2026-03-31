@@ -60,9 +60,7 @@ ${items || '- N/A'}
     .map(r => `| ${r.version || '—'} | ${r.date || '—'} | ${r.notes || '—'} |`)
     .join('\n')
 
-  return `## Overview
-
-${data.overview || ''}
+  return `${data.overview || ''}
 
 ---
 

@@ -146,33 +146,68 @@ const previewStyles = `
   }
 `
 
-export default function PreviewPanel({ data }: Props) {
-  const [copiedRich, setCopiedRich] = useState(false)
-  const [copiedMd,   setCopiedMd]   = useState(false)
+// Split markdown into sections at ## boundaries.
+// The first chunk (before any ## heading) becomes the intro/description section.
+function splitSections(md: string): { label: string; md: string }[] {
+  const stripped = md.replace(/<!--[\s\S]*?-->/g, '').trim()
+  const parts = stripped.split(/^(## .+)$/m)
+  const sections: { label: string; md: string }[] = []
 
-  const markdown = useMemo(() => generateMarkdown(data), [data])
+  if (parts[0].trim()) {
+    sections.push({ label: 'Description', md: parts[0].trim() })
+  }
+  for (let i = 1; i < parts.length; i += 2) {
+    const heading = parts[i]
+    const body = parts[i + 1] ?? ''
+    sections.push({ label: heading.slice(3).trim(), md: (heading + '\n' + body).trim() })
+  }
+  return sections
+}
 
-  const html = useMemo(() => {
-    const cleaned = markdown.replace(/<!--[\s\S]*?-->/g, '')
-    return marked.parse(cleaned) as string
-  }, [markdown])
+async function copyHtml(htmlStr: string) {
+  try {
+    const blob = new Blob([htmlStr], { type: 'text/html' })
+    await navigator.clipboard.write([new ClipboardItem({ 'text/html': blob })])
+  } catch {
+    await navigator.clipboard.writeText(htmlStr)
+  }
+}
 
-  // Copy rendered HTML — pastes as formatted text in Printables' rich text editor
-  async function handleCopyRich() {
-    try {
-      const blob = new Blob([html], { type: 'text/html' })
-      await navigator.clipboard.write([new ClipboardItem({ 'text/html': blob })])
-      setCopiedRich(true)
-      setTimeout(() => setCopiedRich(false), 2000)
-    } catch {
-      // ClipboardItem not supported — fall back to plain HTML string
-      await navigator.clipboard.writeText(html)
-      setCopiedRich(true)
-      setTimeout(() => setCopiedRich(false), 2000)
-    }
+function SectionCard({ label, md }: { label: string; md: string }) {
+  const [copied, setCopied] = useState(false)
+  const html = useMemo(() => marked.parse(md) as string, [md])
+
+  async function handleCopy() {
+    await copyHtml(html)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
   }
 
-  // Copy raw markdown for reference / version control
+  return (
+    <div className="mb-3">
+      <div className="flex items-center justify-between px-1 mb-1">
+        <span className="font-rajdhani text-xs text-slate uppercase tracking-wider">{label}</span>
+        <button
+          className="font-rajdhani text-xs px-2 py-0.5 rounded transition-colors"
+          style={{ background: copied ? '#3d2b63' : 'transparent', color: copied ? '#b46ef5' : '#4a4260', border: '1px solid #2a1d42' }}
+          onClick={handleCopy}
+        >
+          {copied ? '✓ Copied' : 'Copy'}
+        </button>
+      </div>
+      <div className="printables-card">
+        <div className="md-preview" dangerouslySetInnerHTML={{ __html: html }} />
+      </div>
+    </div>
+  )
+}
+
+export default function PreviewPanel({ data }: Props) {
+  const [copiedMd, setCopiedMd] = useState(false)
+
+  const markdown = useMemo(() => generateMarkdown(data), [data])
+  const sections = useMemo(() => splitSections(markdown), [markdown])
+
   function handleCopyMd() {
     navigator.clipboard.writeText(markdown).then(() => {
       setCopiedMd(true)
@@ -187,33 +222,21 @@ export default function PreviewPanel({ data }: Props) {
         <span className="text-ash text-xs font-rajdhani uppercase tracking-wider">
           Printables Preview
         </span>
-        <div className="flex items-center gap-2">
-          <button
-            className="btn-ghost text-xs py-1.5 px-3"
-            onClick={handleCopyMd}
-            title="Copy raw markdown (for version control / backup)"
-          >
-            {copiedMd ? '✓ Copied!' : 'Copy Markdown'}
-          </button>
-          <button
-            className="btn-primary text-sm py-1.5 px-3"
-            onClick={handleCopyRich}
-            title="Copy formatted text — paste directly into Printables description editor"
-          >
-            {copiedRich ? '✓ Copied!' : 'Copy for Printables'}
-          </button>
-        </div>
+        <button
+          className="btn-ghost text-xs py-1.5 px-3"
+          onClick={handleCopyMd}
+          title="Copy raw markdown"
+        >
+          {copiedMd ? '✓ Copied!' : 'Copy Markdown'}
+        </button>
       </div>
 
-      {/* Preview content — styled to match Printables.com */}
+      {/* Per-section preview cards */}
       <style>{previewStyles}</style>
       <div className="printables-page flex-1 overflow-y-auto">
-        <div className="printables-card">
-          <div
-            className="md-preview"
-            dangerouslySetInnerHTML={{ __html: html }}
-          />
-        </div>
+        {sections.map(s => (
+          <SectionCard key={s.label} label={s.label} md={s.md} />
+        ))}
       </div>
     </div>
   )

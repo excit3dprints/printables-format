@@ -144,7 +144,8 @@ export default function FormPanel({ data, onChange }: Props) {
               data.printSettings.topBottomLayers === '5' &&
               data.printSettings.supports === 'None' &&
               data.printSettings.supportInterface === false &&
-              data.printSettings.brim === 'No'
+              data.printSettings.brim === 'No' &&
+              data.printSettings.notes === 'Use standard Voron print settings'
             }
             onChange={e => {
               if (e.target.checked) {
@@ -164,6 +165,7 @@ export default function FormPanel({ data, onChange }: Props) {
                     supportInterface: false,
                     brim: 'No',
                     orientation: 'As exported',
+                    notes: 'Use standard Voron print settings',
                   },
                 })
               }

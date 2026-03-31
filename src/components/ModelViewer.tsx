@@ -21,7 +21,11 @@ const VIEWPOINTS = [
   { label: 'Bottom', key: 'bottom', pos: (r: number) => new THREE.Vector3( 0,       -r * 2.5,   0.001)   },
 ]
 
-export default function ModelViewer() {
+interface Props {
+  onFileLoaded?: (filename: string) => void
+}
+
+export default function ModelViewer({ onFileLoaded }: Props) {
   const containerRef = useRef<HTMLDivElement>(null)
   const canvasRef    = useRef<HTMLCanvasElement>(null)
   const rendererRef  = useRef<THREE.WebGLRenderer | null>(null)
@@ -201,6 +205,7 @@ export default function ModelViewer() {
 
     setModelFileName(fileName)
     setHasModel(true)
+    onFileLoaded?.(fileName)
 
     // Default to iso view after load
     snapToView('iso')

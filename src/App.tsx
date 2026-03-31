@@ -48,6 +48,20 @@ export default function App() {
   const [data, setData] = useState<ModelData>(defaultData)
   const [rightTab, setRightTab] = useState<RightTab>('preview')
 
+  function handleModelFileLoaded(filename: string) {
+    setData(prev => {
+      if (prev.files.some(f => f.filename === filename)) return prev
+      const emptyIdx = prev.files.findIndex(f => !f.filename && !f.description)
+      const updated = [...prev.files]
+      if (emptyIdx >= 0) {
+        updated[emptyIdx] = { filename, description: '' }
+      } else {
+        updated.push({ filename, description: '' })
+      }
+      return { ...prev, files: updated }
+    })
+  }
+
   return (
     <div className="flex flex-col h-screen overflow-hidden bg-void">
       {/* Header */}
@@ -110,7 +124,7 @@ export default function App() {
               </div>
             ) : (
               <div className="h-full">
-                <ModelViewer />
+                <ModelViewer onFileLoaded={handleModelFileLoaded} />
               </div>
             )}
           </div>
