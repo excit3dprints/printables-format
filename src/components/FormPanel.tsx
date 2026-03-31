@@ -1,8 +1,29 @@
+import { useState } from 'react'
 import type { ModelData, PrintSettings, FileRow, BOMRow, ChangelogRow } from '../types'
 
 interface Props {
   data: ModelData
   onChange: (data: ModelData) => void
+}
+
+function CopyButton({ text }: { text: string }) {
+  const [copied, setCopied] = useState(false)
+  function handleCopy() {
+    navigator.clipboard.writeText(text).then(() => {
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    })
+  }
+  return (
+    <button
+      type="button"
+      onClick={handleCopy}
+      className="font-rajdhani text-xs px-2 py-0.5 rounded transition-colors ml-2"
+      style={{ color: copied ? '#b46ef5' : '#4a4260', border: '1px solid #2a1d42', background: copied ? '#3d2b63' : 'transparent' }}
+    >
+      {copied ? '✓' : 'Copy'}
+    </button>
+  )
 }
 
 export default function FormPanel({ data, onChange }: Props) {
@@ -61,7 +82,7 @@ export default function FormPanel({ data, onChange }: Props) {
       <div className="section-card">
         <h2 className="section-heading">Title &amp; Summary</h2>
         <div className="mb-3">
-          <label className="label">Title</label>
+          <label className="label">Title <CopyButton text={data.title} /></label>
           <input
             className="input"
             type="text"
@@ -71,7 +92,7 @@ export default function FormPanel({ data, onChange }: Props) {
           />
         </div>
         <div>
-          <label className="label">Summary</label>
+          <label className="label">Summary <CopyButton text={data.summary} /></label>
           <textarea
             className="textarea"
             rows={3}
@@ -526,7 +547,7 @@ export default function FormPanel({ data, onChange }: Props) {
         </div>
 
         <div className="mb-3">
-          <label className="label">Tags <span className="text-slate normal-case">(space-separated on Printables)</span></label>
+          <label className="label">Tags <span className="text-slate normal-case">(space-separated on Printables)</span><CopyButton text={data.tags} /></label>
           <input
             className="input"
             type="text"
