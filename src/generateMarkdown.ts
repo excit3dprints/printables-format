@@ -1,0 +1,175 @@
+import type { ModelData } from './types'
+
+const LICENSE_TEXTS: Record<string, string> = {
+  'CC BY-NC-SA 4.0':
+    '**Creative Commons — Attribution — Non-Commercial — Share Alike (CC BY-NC-SA 4.0)**\nFree to print and remix for personal use. Commercial use requires written permission from Excit3d. If you remix, share under the same license and credit Excit3d.',
+  'CC BY-SA 4.0':
+    '**Creative Commons — Attribution — Share Alike (CC BY-SA 4.0)**\nFree to use and remix, including commercially, as long as you credit Excit3d and share under the same license.',
+  'CC BY 4.0':
+    '**Creative Commons — Attribution (CC BY 4.0)**\nFree to use, remix, and commercialize as long as you credit Excit3d.',
+  'CC0 1.0':
+    '**Creative Commons Zero (CC0 1.0) — Public Domain**\nNo rights reserved. Do whatever you want with this.',
+  'GPL-3.0':
+    '**GNU General Public License v3.0**\nFree to use, modify, and distribute. Derivative works must also be GPL-3.0.',
+}
+
+export function generateMarkdown(data: ModelData): string {
+  const ps = data.printSettings
+  const materialDisplay =
+    ps.material === 'Other' && ps.customMaterial
+      ? ps.customMaterial
+      : ps.material
+
+  const licenseText =
+    LICENSE_TEXTS[data.license] ??
+    `**${data.license}**`
+
+  // Files table
+  const filesRows = data.files
+    .filter(f => f.filename || f.description)
+    .map(f => `| \`${f.filename || '—'}\` | ${f.description || '—'} |`)
+    .join('\n')
+
+  // BOM section
+  let bomSection: string
+  if (data.noBOM) {
+    bomSection = '*No hardware required — print-in-place / friction fit.*'
+  } else {
+    const bomRows = data.bom
+      .filter(r => r.qty || r.part || r.notes)
+      .map(r => `| ${r.qty || '—'} | ${r.part || '—'} | ${r.notes || '—'} |`)
+      .join('\n')
+    bomSection = `| Qty | Part | Notes |\n|-----|------|-------|\n${bomRows || '| — | — | — |'}`
+  }
+
+  // Assembly steps
+  const assemblyList = data.assemblySteps
+    .filter(s => s.trim())
+    .map((s, i) => `${i + 1}. ${s}`)
+    .join('\n')
+
+  // Post-processing section
+  let postProcessingBlock = ''
+  if (data.includePostProcessing) {
+    const items = data.postProcessing
+      .filter(p => p.trim())
+      .map(p => `- ${p}`)
+      .join('\n')
+    postProcessingBlock = `## Post-Processing
+
+${items || '- N/A'}
+
+---
+
+`
+  }
+
+  // Print settings notes
+  const printNotesLine =
+    ps.notes && ps.notes.trim()
+      ? `\n**Notes on print settings:** ${ps.notes.trim()}\n`
+      : ''
+
+  // Changelog table
+  const changelogRows = data.changelog
+    .filter(r => r.version || r.date || r.notes)
+    .map(r => `| ${r.version || '—'} | ${r.date || '—'} | ${r.notes || '—'} |`)
+    .join('\n')
+
+  return `# ${data.title || 'Untitled Model'} — by Excit3d
+
+${data.summary || ''}
+
+---
+
+## Overview
+
+${data.overview || ''}
+
+---
+
+## Files
+
+| File | Description |
+|------|-------------|
+${filesRows || '| — | — |'}
+
+> Include a STEP or F3D source file wherever possible to support the community.
+
+---
+
+## Print Settings
+
+| Setting | Recommended Value |
+|---------|-------------------|
+| Material | ${materialDisplay} |
+| Nozzle | ${ps.nozzle} |
+| Layer Height | ${ps.layerHeight} mm |
+| Infill | ${ps.infill}% |
+| Infill Pattern | ${ps.infillPattern} |
+| Perimeters / Walls | ${ps.perimeters} |
+| Top / Bottom Layers | ${ps.topBottomLayers} |
+| Supports | ${ps.supports} |
+| Support Interface | ${ps.supportInterface ? 'Yes' : 'No'} |
+| Brim | ${ps.brim} |
+| Print Orientation | ${ps.orientation} |
+${printNotesLine}
+---
+
+## Bill of Materials (Non-Printed Parts)
+
+${bomSection}
+
+---
+
+## Assembly
+
+${assemblyList || '1. No assembly required.'}
+
+> Tip: Add photos or GIFs to each step after uploading to Printables — the image insertion tool in the description editor makes this straightforward.
+
+---
+
+${postProcessingBlock}## Compatibility
+
+${data.compatibility || ''}
+
+---
+
+## Changelog
+
+| Version | Date | Notes |
+|---------|------|-------|
+${changelogRows || '| v1.0 | — | Initial release |'}
+
+---
+
+## About Excit3d
+
+This model is part of the **Excit3d** open-source hardware library. We design and test parts for high-performance FDM machines — and sell the hardware to go with them.
+
+- **Shop:** excit3d.shop
+- **Discord:** discord.gg/G8Q7yUadBy
+- **Contact:** support@excit3d.shop
+
+If you print this, drop a make in the gallery — we love seeing builds in the wild.
+
+---
+
+## License
+
+${licenseText}
+
+---
+
+<!--
+PRINTABLES METADATA
+===================
+Title:    ${data.title || ''}
+Summary:  ${data.summary || ''}
+Category: ${data.category || ''}
+Tags:     ${data.tags || ''}
+License:  ${data.license}
+-->
+`
+}

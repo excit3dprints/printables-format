@@ -1,0 +1,66 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-void text-ghost font-body;
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #5c3d8f #100c1a;
+  }
+
+  *::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: #100c1a;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background-color: #5c3d8f;
+    border-radius: 3px;
+  }
+
+  *::-webkit-scrollbar-thumb:hover {
+    background-color: #7b52c1;
+  }
+}
+
+@layer components {
+  .section-card {
+    @apply bg-cavern/50 border border-shadow rounded-lg p-4;
+  }
+
+  .label {
+    @apply text-ash text-xs font-rajdhani uppercase tracking-wider mb-1 block;
+  }
+
+  .input {
+    @apply w-full bg-abyss border border-shadow rounded px-3 py-2 text-ghost text-sm focus:border-spark focus:outline-none transition-colors;
+  }
+
+  .textarea {
+    @apply w-full bg-abyss border border-shadow rounded px-3 py-2 text-ghost text-sm focus:border-spark focus:outline-none transition-colors resize-y;
+  }
+
+  .btn-primary {
+    @apply bg-brand hover:bg-violet text-ghost font-rajdhani font-semibold px-4 py-2 rounded transition-colors cursor-pointer;
+  }
+
+  .btn-ghost {
+    @apply border border-shadow hover:border-spark text-ash hover:text-ghost px-3 py-1.5 rounded text-sm transition-colors cursor-pointer;
+  }
+
+  .btn-danger {
+    @apply text-ember hover:bg-ember/10 px-2 py-1 rounded text-sm transition-colors cursor-pointer;
+  }
+
+  .section-heading {
+    @apply font-rajdhani uppercase text-xs tracking-widest text-spark pl-2 mb-3 border-l-2 border-spark;
+  }
+}
