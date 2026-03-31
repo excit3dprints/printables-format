@@ -1,17 +1,5 @@
 import type { ModelData } from './types'
 
-const LICENSE_TEXTS: Record<string, string> = {
-  'CC BY-NC-SA 4.0':
-    '**Creative Commons — Attribution — Non-Commercial — Share Alike (CC BY-NC-SA 4.0)**\nFree to print and remix for personal use. Commercial use requires written permission from Excit3d. If you remix, share under the same license and credit Excit3d.',
-  'CC BY-SA 4.0':
-    '**Creative Commons — Attribution — Share Alike (CC BY-SA 4.0)**\nFree to use and remix, including commercially, as long as you credit Excit3d and share under the same license.',
-  'CC BY 4.0':
-    '**Creative Commons — Attribution (CC BY 4.0)**\nFree to use, remix, and commercialize as long as you credit Excit3d.',
-  'CC0 1.0':
-    '**Creative Commons Zero (CC0 1.0) — Public Domain**\nNo rights reserved. Do whatever you want with this.',
-  'GPL-3.0':
-    '**GNU General Public License v3.0**\nFree to use, modify, and distribute. Derivative works must also be GPL-3.0.',
-}
 
 export function generateMarkdown(data: ModelData): string {
   const ps = data.printSettings
@@ -19,10 +7,6 @@ export function generateMarkdown(data: ModelData): string {
     ps.material === 'Other' && ps.customMaterial
       ? ps.customMaterial
       : ps.material
-
-  const licenseText =
-    LICENSE_TEXTS[data.license] ??
-    `**${data.license}**`
 
   // Files table
   const filesRows = data.files
