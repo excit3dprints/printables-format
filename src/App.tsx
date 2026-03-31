@@ -36,6 +36,10 @@ const defaultData: ModelData = {
   license: 'CC BY-NC-SA 4.0',
   tags: '',
   category: '3D Printers > Parts & Upgrades',
+  modelOrigin: 'original',
+  aiUsed: null,
+  contentWarning: false,
+  contentWarningPolitical: false,
 }
 
 type RightTab = 'preview' | 'viewer'

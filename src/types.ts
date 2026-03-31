@@ -34,4 +34,8 @@ export interface ModelData {
   license: string;
   tags: string;
   category: string;
+  modelOrigin: 'original' | 'remix' | 'reupload';
+  aiUsed: boolean | null;
+  contentWarning: boolean;
+  contentWarningPolitical: boolean;
 }

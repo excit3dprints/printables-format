@@ -506,24 +506,36 @@ export default function FormPanel({ data, onChange }: Props) {
 
       {/* 10. Metadata */}
       <div className="section-card">
-        <h2 className="section-heading">Metadata (Printables Upload Form)</h2>
-        <p className="text-ash text-xs mb-3 font-body">
-          These fields go in the Printables upload form, not in the description body.
-        </p>
+        <h2 className="section-heading">Printables Upload Form Fields</h2>
+
+        {/* Callout explaining the split */}
+        <div className="mb-4 px-3 py-2.5 rounded border border-dusk bg-shadow/40 text-xs font-body leading-relaxed">
+          <span className="text-spark font-semibold">These fields are filled directly in the Printables upload form</span>
+          <span className="text-ash"> — they live above the description box and are </span>
+          <span className="text-ghost">not</span>
+          <span className="text-ash"> part of the text you paste. Use </span>
+          <span className="text-ghost font-semibold">Copy for Printables</span>
+          <span className="text-ash"> only for the description body.</span>
+        </div>
+
+        {/* Model name + summary reminder */}
+        <div className="mb-3 px-3 py-2 rounded bg-abyss border border-shadow text-xs text-ash font-body">
+          <span className="text-ghost">Model name</span> and <span className="text-ghost">Summary</span> are also separate upload form fields — copy them from the Title and Summary you filled in above.
+        </div>
 
         <div className="mb-3">
-          <label className="label">Tags (comma-separated)</label>
+          <label className="label">Tags <span className="text-slate normal-case">(space-separated on Printables)</span></label>
           <input
             className="input"
             type="text"
-            placeholder="voron, toolhead, PETG, functional"
+            placeholder="voron toolhead PETG functional"
             value={data.tags}
             onChange={e => update('tags', e.target.value)}
           />
         </div>
 
         <div className="mb-3">
-          <label className="label">Category</label>
+          <label className="label">Main Category</label>
           <select
             className="input"
             value={data.category}
@@ -547,7 +559,7 @@ export default function FormPanel({ data, onChange }: Props) {
           </select>
         </div>
 
-        <div>
+        <div className="mb-3">
           <label className="label">License</label>
           <select
             className="input"
@@ -558,6 +570,61 @@ export default function FormPanel({ data, onChange }: Props) {
               <option key={l} value={l}>{l}</option>
             ))}
           </select>
+        </div>
+
+        <div className="mb-3">
+          <label className="label">Model Origin</label>
+          <select
+            className="input"
+            value={data.modelOrigin}
+            onChange={e => update('modelOrigin', e.target.value as ModelData['modelOrigin'])}
+          >
+            <option value="original">Original model — I made it</option>
+            <option value="remix">Remix / variation of another model</option>
+            <option value="reupload">Reupload from another website</option>
+          </select>
+        </div>
+
+        <div className="mb-3">
+          <label className="label">Was AI used to create this model?</label>
+          <div className="flex gap-4 mt-1">
+            {([['yes', true], ['no', false], ['unset', null]] as const).map(([label, val]) => (
+              <label key={label} className="flex items-center gap-1.5 cursor-pointer">
+                <input
+                  type="radio"
+                  className="accent-spark"
+                  name="aiUsed"
+                  checked={data.aiUsed === val}
+                  onChange={() => update('aiUsed', val)}
+                />
+                <span className="text-ash text-sm capitalize font-body">{label === 'unset' ? 'not answered' : label}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <label className="label">Content Warnings</label>
+          <div className="flex flex-col gap-1.5 mt-1">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                className="accent-spark w-4 h-4"
+                checked={data.contentWarning}
+                onChange={e => update('contentWarning', e.target.checked)}
+              />
+              <span className="text-ash text-sm font-body">Nudity, violence, profanity, or other potentially disturbing content</span>
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                className="accent-spark w-4 h-4"
+                checked={data.contentWarningPolitical}
+                onChange={e => update('contentWarningPolitical', e.target.checked)}
+              />
+              <span className="text-ash text-sm font-body">Political content</span>
+            </label>
+          </div>
         </div>
       </div>
 
