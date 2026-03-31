@@ -147,20 +147,36 @@ const previewStyles = `
 `
 
 export default function PreviewPanel({ data }: Props) {
-  const [copied, setCopied] = useState(false)
+  const [copiedRich, setCopiedRich] = useState(false)
+  const [copiedMd,   setCopiedMd]   = useState(false)
 
   const markdown = useMemo(() => generateMarkdown(data), [data])
 
   const html = useMemo(() => {
-    // Strip HTML comment blocks before rendering
     const cleaned = markdown.replace(/<!--[\s\S]*?-->/g, '')
     return marked.parse(cleaned) as string
   }, [markdown])
 
-  function handleCopy() {
+  // Copy rendered HTML — pastes as formatted text in Printables' rich text editor
+  async function handleCopyRich() {
+    try {
+      const blob = new Blob([html], { type: 'text/html' })
+      await navigator.clipboard.write([new ClipboardItem({ 'text/html': blob })])
+      setCopiedRich(true)
+      setTimeout(() => setCopiedRich(false), 2000)
+    } catch {
+      // ClipboardItem not supported — fall back to plain HTML string
+      await navigator.clipboard.writeText(html)
+      setCopiedRich(true)
+      setTimeout(() => setCopiedRich(false), 2000)
+    }
+  }
+
+  // Copy raw markdown for reference / version control
+  function handleCopyMd() {
     navigator.clipboard.writeText(markdown).then(() => {
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
+      setCopiedMd(true)
+      setTimeout(() => setCopiedMd(false), 2000)
     })
   }
 
@@ -169,14 +185,24 @@ export default function PreviewPanel({ data }: Props) {
       {/* Top bar */}
       <div className="flex-shrink-0 flex items-center justify-between px-4 py-3 bg-deep border-b border-shadow">
         <span className="text-ash text-xs font-rajdhani uppercase tracking-wider">
-          Markdown Preview
+          Printables Preview
         </span>
-        <button
-          className="btn-primary text-sm py-1.5 px-3"
-          onClick={handleCopy}
-        >
-          {copied ? '✓ Copied!' : 'Copy Markdown'}
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            className="btn-ghost text-xs py-1.5 px-3"
+            onClick={handleCopyMd}
+            title="Copy raw markdown (for version control / backup)"
+          >
+            {copiedMd ? '✓ Copied!' : 'Copy Markdown'}
+          </button>
+          <button
+            className="btn-primary text-sm py-1.5 px-3"
+            onClick={handleCopyRich}
+            title="Copy formatted text — paste directly into Printables description editor"
+          >
+            {copiedRich ? '✓ Copied!' : 'Copy for Printables'}
+          </button>
+        </div>
       </div>
 
       {/* Preview content — styled to match Printables.com */}
