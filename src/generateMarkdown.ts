@@ -76,13 +76,7 @@ ${items || '- N/A'}
     .map(r => `| ${r.version || '—'} | ${r.date || '—'} | ${r.notes || '—'} |`)
     .join('\n')
 
-  return `# ${data.title || 'Untitled Model'} — by Excit3d
-
-${data.summary || ''}
-
----
-
-## Overview
+  return `## Overview
 
 ${data.overview || ''}
 
@@ -93,8 +87,6 @@ ${data.overview || ''}
 | File | Description |
 |------|-------------|
 ${filesRows || '| — | — |'}
-
-> Include a STEP or F3D source file wherever possible to support the community.
 
 ---
 
@@ -126,8 +118,6 @@ ${bomSection}
 
 ${assemblyList || '1. No assembly required.'}
 
-> Tip: Add photos or GIFs to each step after uploading to Printables — the image insertion tool in the description editor makes this straightforward.
-
 ---
 
 ${postProcessingBlock}## Compatibility
@@ -156,20 +146,19 @@ If you print this, drop a make in the gallery — we love seeing builds in the w
 
 ---
 
-## License
-
-${licenseText}
-
----
-
 <!--
-PRINTABLES METADATA
-===================
-Title:    ${data.title || ''}
-Summary:  ${data.summary || ''}
-Category: ${data.category || ''}
-Tags:     ${data.tags || ''}
-License:  ${data.license}
+PRINTABLES UPLOAD FORM CHECKLIST
+=================================
+[ ] Model name:    ${data.title || ''}
+[ ] Summary:       ${data.summary || ''}
+[ ] Main category: ${data.category || ''}
+[ ] Tags:          ${data.tags || ''}
+[ ] License:       ${data.license}
+[ ] Model origin:  ${data.modelOrigin === 'original' ? 'Original model' : data.modelOrigin === 'remix' ? 'Remix / variation' : 'Reupload'}
+[ ] AI used:       ${data.aiUsed === true ? 'Yes — AI-assisted' : data.aiUsed === false ? 'No — fully human-made' : '(not answered)'}
+${data.contentWarning ? '[ ] Content warning: nudity/violence/profanity/disturbing content\n' : ''}${data.contentWarningPolitical ? '[ ] Content warning: political content\n' : ''}[ ] Upload STL/3MF/STEP files
+[ ] Upload cover photo
+[ ] Paste description (use "Copy for Printables" button)
 -->
 `
 }
